@@ -1,12 +1,20 @@
 package com.deny.data.repositories
 
-import com.deny.data.extensions.flowTransform
+import com.deny.data.remote.models.request.ProgressRequestBody
 import com.deny.data.remote.models.response.toModel
 import com.deny.data.remote.services.ApiService
 import com.deny.domain.models.UploadModel
+import com.deny.domain.models.UploadStatus
 import com.deny.domain.repositories.Repository
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -18,15 +26,27 @@ class RepositoryImpl constructor(
     private val apiService: ApiService
 ) : Repository {
 
-    override fun uploadVideo(fileUri: File): Flow<UploadModel> = flowTransform {
+    override fun uploadVideo(fileUri: File): Flow<UploadStatus> = channelFlow {
+        send(UploadStatus.Progress(0)) // Initial progress
 
-        val requestBody = fileUri.asRequestBody("video/mp4".toMediaTypeOrNull())
+        val requestBody = ProgressRequestBody(fileUri, "video/mp4") { progress ->
+            launch { send(UploadStatus.Progress(progress)) }
+        }
+
         val filePart = MultipartBody.Part.createFormData("file", fileUri.name, requestBody)
         val uploadPresetPart = "android_sample".toRequestBody(MultipartBody.FORM)
         val apiKeyPart = "915474367897474".toRequestBody(MultipartBody.FORM)
         val publicIdPart = fileUri.name.toRequestBody(MultipartBody.FORM)
-        apiService.uploadVideo(filePart, uploadPresetPart, apiKeyPart, publicIdPart).toModel()
 
+        try {
+            // Upload the file
+            val response = apiService.uploadVideo(filePart, uploadPresetPart, apiKeyPart, publicIdPart)
+            send(UploadStatus.Success(response.toModel()))
+        } catch (e: Exception) {
+            send(UploadStatus.Error(e))
+        }
+
+        awaitClose { /* Channel cleanup if needed */ }
     }
 
 }

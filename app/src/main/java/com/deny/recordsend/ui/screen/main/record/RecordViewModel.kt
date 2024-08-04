@@ -8,11 +8,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.core.net.toFile
 import androidx.lifecycle.viewModelScope
 import com.deny.domain.models.UploadModel
+import com.deny.domain.models.UploadStatus
 import com.deny.domain.models.UploadedVideoEntity
 import com.deny.domain.repositories.LocalRepository
 import com.deny.domain.usecases.UploadVideoUseCase
 import com.deny.recordsend.ui.base.BaseViewModel
-import com.deny.recordsend.ui.screen.main.dashboard.UploadStatus
 import com.deny.recordsend.utilities.DispatchersProvider
 import com.deny.recordsend.utilities.FILE_NAME
 import com.deny.recordsend.utilities.file_checker.FileHelper
@@ -20,6 +20,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
@@ -43,27 +44,25 @@ class RecordViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     private val _uploadStatus = MutableStateFlow<UploadStatus>(UploadStatus.Idle)
-    val uploadStatus = _uploadStatus.asStateFlow()
+    val uploadStatus: StateFlow<UploadStatus> = _uploadStatus.asStateFlow()
 
     private val mContext by lazy { context }
     private var isPaused = false
 
-    fun uploadVideo(file : File) {
+    fun uploadVideo(file: File) {
         Timber.e("file.name ${file.name}")
-        val uri = fileChecker.getFileUri(file.name)
-        uploadVideoUseCase(uri.toFile())
-            .injectLoading()
-            .onEach {
-                _uploadStatus.emit(UploadStatus.Success(it))
-                Timber.e("_uploadStatus $it")
-                saveVideoToLocalDb(it)
-            }
+        uploadVideoUseCase(file)
             .flowOn(dispatchersProvider.io)
-            .catch {
-                _uploadStatus.emit(UploadStatus.Error(it))
+            .onEach { status ->
+                _uploadStatus.emit(status)
+                if (status is UploadStatus.Success) {
+                    saveVideoToLocalDb(status.result)
+                }
+            }
+            .catch { exception ->
+                _uploadStatus.emit(UploadStatus.Error(exception))
             }
             .launchIn(viewModelScope)
-
     }
 
     private fun saveVideoToLocalDb(uploadModel: UploadModel) {

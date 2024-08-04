@@ -37,6 +37,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.deny.domain.models.UploadStatus
 import com.deny.recordsend.extensions.isPermissionGranted
 import com.deny.recordsend.extensions.showToast
 import com.deny.recordsend.lib.IsLoading
@@ -44,11 +45,11 @@ import com.deny.recordsend.ui.base.BaseDestination
 import com.deny.recordsend.ui.base.BaseScreen
 import com.deny.recordsend.ui.base.KeyUpdated
 import com.deny.recordsend.ui.common.CameraPreview
-import com.deny.recordsend.ui.screen.main.dashboard.UploadStatus
 import com.deny.recordsend.utilities.CAMERA_PERMISSION
 import com.deny.recordsend.utilities.FILE_NAME
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -61,23 +62,41 @@ fun RecordScreen(
 ) {
     val context = LocalContext.current
     val isLoading: IsLoading by viewModel.isLoading.collectAsStateWithLifecycle()
-    val uploadStatus: UploadStatus by viewModel.uploadStatus.collectAsState()
+    val uploadStatus by viewModel.uploadStatus.collectAsStateWithLifecycle()
 
-    LaunchedEffect(uploadStatus) {
-        when (uploadStatus) {
-            is UploadStatus.Success -> {
-                context.showToast("Upload successful")
-                navigator(BaseDestination.Up().addResult(KeyUpdated, true))
+    when (uploadStatus) {
+        is UploadStatus.Progress -> {
+            val progress = (uploadStatus as UploadStatus.Progress).percentage
+            Dialog(onDismissRequest = {}) {
+                Box(
+                    modifier = Modifier
+                        .size(120.dp)
+                        .background(Color.White, shape = RoundedCornerShape(8.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(progress = progress / 100f, modifier = Modifier.size(80.dp))
+                    Text(text = "$progress%", color = Color.Black, fontSize = 18.sp, fontWeight = FontWeight.Bold,)
+                }
             }
-            is UploadStatus.Error -> {
-                context.showToast("Upload failed")
-            }
-            else -> { /* Do nothing */ }
+        }
+        is UploadStatus.Success -> {
+            // Show success UI
+            context.showToast("Upload successful")
+            navigator(BaseDestination.Up().addResult(KeyUpdated, true))
+        }
+        is UploadStatus.Error -> {
+            // Show error UI
+            Timber.e("Upload ${(uploadStatus as UploadStatus.Error).exception}")
+            context.showToast("Upload failed ${(uploadStatus as UploadStatus.Error).exception}")
+            navigator(BaseDestination.Up().addResult(KeyUpdated, true))
+        }
+        else -> {
+            // Initial or idle state UI
         }
     }
 
     RecordingScreen(
-        isLoading,
+        false,
         onRecordingFinished = {
             it?.let {
                 viewModel.uploadVideo(it)
@@ -222,6 +241,7 @@ fun RecordingScreen(
         }
     }
 }
+
 
 @SuppressLint("MissingPermission")
 private fun startRecording(

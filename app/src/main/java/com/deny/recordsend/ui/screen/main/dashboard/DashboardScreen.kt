@@ -27,6 +27,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import coil.transform.RoundedCornersTransformation
+import com.deny.domain.models.UploadStatus
 import com.deny.recordsend.R
 import com.deny.recordsend.extensions.collectAsEffect
 import com.deny.recordsend.extensions.showToast
@@ -78,7 +79,7 @@ fun DashboardScreen(
     HomeScreenContent(
         isLoading = isLoading,
         onStartRecording = viewModel::navigateToRecording,
-        onUploadVideo = viewModel::uploadVideo,
+        onUploadVideo = {  },
         onNavigateToList = viewModel::navigateToList,
         dashboardUIState = dashboardUIState,
     )
@@ -112,7 +113,8 @@ private fun HomeScreenContent(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues).background(Color.White)
+                .padding(paddingValues)
+                .background(Color.White)
         ) {
 
             Column(

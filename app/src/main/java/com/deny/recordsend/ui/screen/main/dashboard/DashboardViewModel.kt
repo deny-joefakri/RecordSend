@@ -4,6 +4,7 @@ import androidx.core.net.toFile
 import androidx.lifecycle.viewModelScope
 import com.deny.domain.models.UploadedVideoEntity
 import com.deny.domain.models.UploadModel
+import com.deny.domain.models.UploadStatus
 import com.deny.domain.repositories.LocalRepository
 import com.deny.domain.usecases.UploadVideoUseCase
 import com.deny.recordsend.ui.base.BaseViewModel
@@ -61,21 +62,6 @@ class DashboardViewModel @Inject constructor(
         }
     }
 
-    fun uploadVideo() {
-        val uri = fileChecker.getFileUri(FILE_NAME)
-        uploadVideoUseCase(uri.toFile())
-            .injectLoading()
-            .onEach {
-                _uploadStatus.emit(UploadStatus.Success(it))
-                saveVideoToLocalDb(it)
-            }
-            .flowOn(dispatchersProvider.io)
-            .catch {
-                _uploadStatus.emit(UploadStatus.Error(it))
-            }
-            .launchIn(viewModelScope)
-
-    }
 
     private fun saveVideoToLocalDb(uploadModel: UploadModel) {
         viewModelScope.launch(dispatchersProvider.io) {
