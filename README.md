@@ -1,5 +1,3 @@
-Sure! Here is the enhanced README and test instructions:
-
 # Video Recording and Upload Application
 
 Hello! We hope you are doing great today and would like to thank you for taking your time to work on this exercise.
