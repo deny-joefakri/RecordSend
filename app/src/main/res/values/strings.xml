@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">RecordSend</string>
+    <string name="error_generic">Unexpected error</string>
+    <string name="record_screen">Recording</string>
+</resources>
