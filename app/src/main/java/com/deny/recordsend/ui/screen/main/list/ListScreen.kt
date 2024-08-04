@@ -20,6 +20,8 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.Button
+import androidx.compose.material.Scaffold
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,6 +39,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.ImageLoader
@@ -46,9 +49,11 @@ import coil.compose.rememberImagePainter
 import coil.decode.VideoFrameDecoder
 import coil.load
 import com.deny.domain.models.UploadedVideoEntity
+import com.deny.recordsend.R
 import com.deny.recordsend.extensions.collectAsEffect
 import com.deny.recordsend.ui.base.BaseDestination
 import com.deny.recordsend.ui.base.BaseScreen
+import com.deny.recordsend.ui.common.AppBar
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -72,15 +77,25 @@ fun ListDataScreen(
 
 @Composable
 fun VideoGrid(videos: List<UploadedVideoEntity>, onClick: (Int) -> Unit) {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(8.dp)
-    ) {
-        items(videos) { video ->
-            VideoItem(video, onClick)
+    Scaffold(topBar = {
+        AppBar(
+            R.string.app_name,
+        )
+    }) { paddingValues ->
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            modifier = Modifier.fillMaxSize()
+                .padding(paddingValues).background(Color.White),
+            contentPadding = PaddingValues(8.dp)
+        ) {
+            items(videos) { video ->
+                VideoItem(video, onClick)
+            }
         }
+
     }
+
+
 }
 
 @Composable

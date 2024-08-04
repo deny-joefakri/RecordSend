@@ -6,6 +6,8 @@ Hello! We hope you are doing great today and would like to thank you for taking 
 
 ## Project Overview
 
+![Demo](assets/demo.gif)
+
 ### Objective
 
 Build an Android application that allows users to record videos and upload them to a specified REST API endpoint with the following features:
