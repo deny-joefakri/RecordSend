@@ -45,6 +45,20 @@ This app is already integrated with the Cloudinary SDK but cannot support upload
 - **Video Player**: ExoPlayer
 - **Cloudinary SDK**: Player
 
+### Future Enhancements
+
+1. **Unit Testing**: Integrate unit tests to ensure the logic in ViewModel and other components works correctly. This can be done using libraries like JUnit, MockK, and Turbine for testing Flows.
+2. **UI Testing**: Add UI tests using Jetpack Compose Testing library to ensure the UI behaves as expected. This includes testing the video recording, upload, and playback functionalities.
+3. **Integration Testing**: Add integration tests to ensure the app's modules interact correctly. This can include testing the interaction between the UI, ViewModel, and repository.
+4. **Better Error Handling**: Improve error handling by providing more detailed feedback to the user, including specific error messages for network issues, file issues, etc.
+5. **Optimization**: Optimize video recording and uploading processes to handle larger files more efficiently. This can include compressing videos before upload and optimizing network calls.
+6. **Continuous Integration**: Set up a CI/CD pipeline to automate the build and test process using tools like GitHub Actions, CircleCI, or Jenkins.
+7. **User Authentication**: Add user authentication to manage user-specific video uploads and ensure secure access to the app's functionalities.
+8. **Cloud Storage Integration**: Integrate with other cloud storage providers to give users more options for storing their videos.
+9. **Enhanced UI/UX**: Improve the UI/UX with better design elements, animations, and transitions to provide a smoother user experience.
+10. **Feature Enhancements**: Add features like video editing, video filters, and more advanced playback controls to enhance the app's capabilities.
+
+
 ## Setup
 
 - Clone the project
@@ -72,3 +86,5 @@ This app is already integrated with the Cloudinary SDK but cannot support upload
 ## Run the App
 
 - Deploy the app to an emulator or physical device.
+
+
