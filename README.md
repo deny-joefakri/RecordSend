@@ -4,7 +4,7 @@ Hello! I hope you are doing great today and would like to thank you for taking t
 
 ## Project Overview
 
-![Demo](assets/demo.gif)
+![Demo](assets/demo2.gif)
 
 ### Objective
 
