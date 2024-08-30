@@ -1,7 +1,5 @@
 # Video Recording and Upload Application
 
-Hello! I hope you are doing great today and would like to thank you for taking the time to review my exercise.
-
 ## Project Overview
 
 ![Demo](assets/demo2.gif)
@@ -87,4 +85,6 @@ This app is already integrated with the Cloudinary SDK but cannot support upload
 
 - Deploy the app to an emulator or physical device.
 
+## Acknowledgment
 
+This project was built using the Android template provided by [Nimble](https://github.com/nimblehq/android-templates). I want to express my gratitude to Nimble for making such an excellent template available. It has greatly streamlined my development process and ensured the project maintains a high standard of quality. You can find credit to Nimble’s template source in my public GitHub projects.
